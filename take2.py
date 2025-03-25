@@ -34,9 +34,9 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         """
 
         # Use the correct method to make a query to Groq
-        response = client.chat(
+        response = client.query(
             prompt=prompt,
-            model="gpt-3.5-turbo",  # Adjust model name if needed
+            model="mixtral-8x7b",  # Adjust model name if needed
             temperature=0.7
         )
 
