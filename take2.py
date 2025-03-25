@@ -1,17 +1,15 @@
 import streamlit as st
-import requests
 import os
+import groq
 
 # Load API Key securely from Streamlit secrets or environment variables
 API_KEY = st.secrets["GROQ_API_KEY"] if "GROQ_API_KEY" in st.secrets else os.getenv("GROQ_API_KEY")
-API_URL = "https://api.groq.com/openai/v1/chat/completions"  # Confirm endpoint with Groq API docs
+
+# Initialize Groq Client
+client = groq.Client(api_key=API_KEY)
 
 def get_take_rate(model1, model2, customer_group, market):
-    """Fetch take rate simulation from Groq API."""
-    headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
-    }
+    """Fetch take rate simulation from Groq API using the client."""
     
     prompt = f"""
     Given the following EV models and market conditions, predict the take rate for each model.
@@ -24,31 +22,27 @@ def get_take_rate(model1, model2, customer_group, market):
     Return the take rates as percentages summing to 100%.
     """
 
-    payload = {
-        "model": "mixtral-8x7b",  # Adjust this based on Groq's available models
-        "messages": [{"role": "system", "content": "You are an expert in EV market analysis."},
-                     {"role": "user", "content": prompt}],
-        "temperature": 0.7
-    }
+    response = client.chat.completions.create(
+        model="mixtral-8x7b",  # Adjust model based on Groq's available models
+        messages=[
+            {"role": "system", "content": "You are an expert in EV market analysis."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7
+    )
 
-    response = requests.post(API_URL, headers=headers, json=payload)
-
-    if response.status_code == 200:
-        result = response.json()
-        take_rates = result["choices"][0]["message"]["content"]
-        return parse_take_rates(take_rates)  # Function to extract numbers from text response
-    else:
-        st.error(f"API Error: {response.text}")
-        return None, None
+    take_rates = response.choices[0].message.content
+    return parse_take_rates(take_rates)  # Function to extract numbers from response
 
 def parse_take_rates(response_text):
-    """Extracts numerical take rates from API response text."""
+    """Extracts numerical take rates from the response."""
     import re
     matches = re.findall(r"(\d+)", response_text)
     if len(matches) >= 2:
         return int(matches[0]), int(matches[1])
     return None, None
 
+# Streamlit UI
 st.title("EV Model Take Rate Simulator")
 
 # Sidebar inputs
