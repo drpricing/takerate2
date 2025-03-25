@@ -76,7 +76,7 @@ def parse_take_rates(response_text):
     return None, None
 
 # Streamlit App UI
-st.title("EV Model Take Rate Simulator")
+st.title("EV Model Take Rate Simulator Big B")
 
 # Sidebar for entering Groq API Key
 st.sidebar.header("Enter Your Groq API Key")
