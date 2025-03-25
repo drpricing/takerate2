@@ -41,6 +41,9 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         # Convert the response object to a dictionary
         response_dict = response.model_dump()
         
+        # Print the raw API response for debugging
+        st.write("Raw API Response:", response_dict)
+        
         # Parse the response from Groq and extract the take rates
         take_rates = response_dict['choices'][0]['message']['content']
         take_rate1, take_rate2 = parse_take_rates(take_rates)
@@ -68,7 +71,7 @@ def parse_take_rates(response_text):
     return None, None
 
 # Streamlit App UI
-st.title("EV Model Take Rate Simulator Groq")
+st.title("EV Model Take Rate Simulator")
 
 # Sidebar for entering Groq API Key
 st.sidebar.header("Enter Your Groq API Key")
