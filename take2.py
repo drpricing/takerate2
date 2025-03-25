@@ -44,8 +44,9 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         # Print the raw API response for debugging
         st.write("Raw API Response:", response_dict)
         
-        # Parse the response from Groq and extract the take rates
+        # Parse the response from Groq and extract the take rates and reasoning
         take_rates = response_dict['choices'][0]['message']['content']
+        reasoning = response_dict['choices'][0]['message']['content']
         take_rate1, take_rate2 = parse_take_rates(take_rates)
         
         # Validate and normalize take rates
@@ -55,11 +56,11 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
                 take_rate1 = (take_rate1 / total) * 100
                 take_rate2 = (take_rate2 / total) * 100
         
-        return take_rate1, take_rate2
+        return take_rate1, take_rate2, reasoning
     
     except Exception as e:
         st.error(f"Error with Groq API: {str(e)}")
-        return None, None
+        return None, None, None
 
 # Function to extract numerical take rates from the Groq API response
 def parse_take_rates(response_text):
@@ -71,7 +72,7 @@ def parse_take_rates(response_text):
     return None, None
 
 # Streamlit App UI
-st.title("EV Model Take Rate Simulator Groq")
+st.title("EV Model Take Rate Simulator Big G")
 
 # Sidebar for entering Groq API Key
 st.sidebar.header("Enter Your Groq API Key")
@@ -110,12 +111,23 @@ if st.button("Simulate Take Rates"):
         model2 = {"brand": brand2, "bodytype": bodytype2, "electric_range": e_range2, "price": price2, "adas": adas2}
         
         # Get take rates from the Groq API
-        take_rate1, take_rate2 = get_take_rate(model1, model2, customer_group, market, api_key)
+        take_rate1, take_rate2, reasoning = get_take_rate(model1, model2, customer_group, market, api_key)
         
         # Display results
         if take_rate1 is not None and take_rate2 is not None:
             st.success(f"Take Rate for Model 1: {take_rate1:.2f}%")
             st.success(f"Take Rate for Model 2: {take_rate2:.2f}%")
             st.bar_chart({"Model 1": take_rate1, "Model 2": take_rate2})
+            
+            # Format and display reasoning
+            st.markdown("### Reasoning")
+            formatted_reasoning = format_reasoning(reasoning)
+            st.markdown(formatted_reasoning)
         else:
             st.warning("Please enter your API key to simulate take rates.")
+
+# Function to format reasoning text
+def format_reasoning(reasoning_text):
+    """Formats the reasoning text for better readability."""
+    formatted_text = reasoning_text.replace("**", "###").replace("*", "-")
+    return formatted_text
