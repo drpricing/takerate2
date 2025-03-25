@@ -5,7 +5,7 @@ import groq
 # Function to format reasoning text
 def format_reasoning(reasoning_text):
     """Formats the reasoning text for better readability."""
-    formatted_text = reasoning_text.replace("**", "###").replace("*", "-")
+    formatted_text = reasoning_text.replace("**", "**").replace("*", "-")
     return formatted_text
 
 # Function to handle Groq client initialization and take rate simulation
@@ -39,7 +39,7 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         """
         
         # Use the correct method to make a query to Groq
-        response = client.chat.completions.create(
+       response = client.chat.completions.create(
             model="llama3-70b-8192", # Adjust model name if needed
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7
@@ -76,7 +76,7 @@ def parse_take_rates(response_text):
     return None, None
 
 # Streamlit App UI
-st.title("EV Model Take Rate Simulator - llama3 Inside")
+st.title("EV Model Take Rate Simulator - llama3")
 
 # Read API key from secrets
 api_key = st.secrets["groq"]["api_key"]
