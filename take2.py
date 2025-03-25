@@ -13,8 +13,20 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         prompt = f"""
         Given the following EV models and market conditions, predict the take rate for each model.
 
-        **Model 1:** {model1}
-        **Model 2:** {model2}
+        **Model 1:**
+        Brand: {model1['brand']}
+        Body Type: {model1['bodytype']}
+        Electric Range: {model1['electric_range']} km
+        Price: {model1['price']} k USD
+        ADAS Level: {model1['adas']}
+        
+        **Model 2:**
+        Brand: {model2['brand']}
+        Body Type: {model2['bodytype']}
+        Electric Range: {model2['electric_range']} km
+        Price: {model2['price']} k USD
+        ADAS Level: {model2['adas']}
+        
         **Customer Group:** {customer_group}
         **Market:** {market}
 
