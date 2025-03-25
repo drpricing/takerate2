@@ -47,9 +47,6 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         # Convert the response object to a dictionary
         response_dict = response.model_dump()
         
-        # Print the raw API response for debugging
-        st.write("Raw API Response:", response_dict)
-        
         # Parse the response from Groq and extract the take rates and reasoning
         take_rates = response_dict['choices'][0]['message']['content']
         reasoning = response_dict['choices'][0]['message']['content']
