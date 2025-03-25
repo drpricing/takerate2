@@ -34,6 +34,7 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         
         **Customer Group:** {customer_group}
         **Market:** {market}
+        Consider the preferences and characteristics of the specified customer group and market when predicting the take rates.
         Return the take rates as percentages summing to 100%.
         """
         
