@@ -12,7 +12,6 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         # Construct the prompt for the Groq model
         prompt = f"""
         Given the following EV models and market conditions, predict the take rate for each model.
-
         **Model 1:**
         Brand: {model1['brand']}
         Body Type: {model1['bodytype']}
@@ -29,17 +28,16 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         
         **Customer Group:** {customer_group}
         **Market:** {market}
-
         Return the take rates as percentages summing to 100%.
         """
-
+        
         # Use the correct method to make a query to Groq
-        response = client.query(
+        response = client.generate(
             prompt=prompt,
-            model="mixtral-8x7b",  # Adjust model name if needed
+            model="mixtral-8x7b", # Adjust model name if needed
             temperature=0.7
         )
-
+        
         # Parse the response from Groq and extract the take rates
         take_rates = response['choices'][0]['message']['content']
         return parse_take_rates(take_rates)
@@ -62,8 +60,7 @@ st.title("EV Model Take Rate Simulator")
 
 # Sidebar for entering Groq API Key
 st.sidebar.header("Enter Your Groq API Key")
-api_key = st.sidebar.text_input("API Key", type="password")  # Secure input field
-
+api_key = st.sidebar.text_input("API Key", type="password") # Secure input field
 if not api_key:
     st.warning("Please enter your Groq API key in the sidebar to proceed.")
 
@@ -75,7 +72,6 @@ market = st.sidebar.selectbox("Market", ["Germany", "China", "US"])
 
 # Columns for selecting EV models
 col1, col2 = st.columns(2)
-
 with col1:
     st.subheader("Model 1")
     brand1 = st.selectbox("Brand", ["Tesla", "BYD", "Nio", "Xpeng", "Lucid"], key='brand1')
@@ -83,7 +79,6 @@ with col1:
     e_range1 = st.slider("Electric Range (km)", 100, 1500, 500, key='range1')
     price1 = st.slider("Price (k USD)", 20, 150, 50, key='price1')
     adas1 = st.selectbox("ADAS Level", ["L2", "L3", "L3+"], key='adas1')
-
 with col2:
     st.subheader("Model 2")
     brand2 = st.selectbox("Brand", ["Tesla", "BYD", "Nio", "Xpeng", "Lucid"], key='brand2')
@@ -107,5 +102,5 @@ if st.button("Simulate Take Rates"):
             st.success(f"Take Rate for Model 1: {take_rate1}%")
             st.success(f"Take Rate for Model 2: {take_rate2}%")
             st.bar_chart({"Model 1": take_rate1, "Model 2": take_rate2})
-    else:
-        st.warning("Please enter your API key to simulate take rates.")
+        else:
+            st.warning("Please enter your API key to simulate take rates.")
