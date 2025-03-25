@@ -32,14 +32,17 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         """
         
         # Use the correct method to make a query to Groq
-        response = client.chat.completions.create(
+        response = client.create_chat_completion(
             model="llama3-70b-8192", # Adjust model name if needed
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7
         )
         
+        # Convert the response object to a dictionary
+        response_dict = response.model_dump()
+        
         # Parse the response from Groq and extract the take rates
-        take_rates = response['choices'][0]['message']['content']
+        take_rates = response_dict['choices'][0]['message']['content']
         return parse_take_rates(take_rates)
     
     except Exception as e:
