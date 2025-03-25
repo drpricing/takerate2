@@ -1,44 +1,63 @@
 import streamlit as st
 import requests
-import json
+import os
 
-# Function to call Groq API for take rate simulation
-def simulate_take_rate(model1, model2, customer_group, market):
-    api_url = "https://api.groq.com/simulate_take_rate"
-    headers = {"Content-Type": "application/json", "Authorization": "Bearer YOUR_API_KEY"}
-    
-    payload = {
-        "model1": model1,
-        "model2": model2,
-        "customer_group": customer_group,
-        "market": market
+# Load API Key securely from Streamlit secrets or environment variables
+API_KEY = st.secrets["GROQ_API_KEY"] if "GROQ_API_KEY" in st.secrets else os.getenv("GROQ_API_KEY")
+API_URL = "https://api.groq.com/openai/v1/chat/completions"  # Confirm endpoint with Groq API docs
+
+def get_take_rate(model1, model2, customer_group, market):
+    """Fetch take rate simulation from Groq API."""
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
     }
     
-    try:
-        response = requests.post(api_url, headers=headers, data=json.dumps(payload))
-        response_data = response.json()
-        return response_data.get("take_rate_model1", 50), response_data.get("take_rate_model2", 50)
-    except Exception as e:
-        st.error(f"Error fetching take rates: {e}")
-        return 50, 50  # Default to 50-50 split in case of failure
+    prompt = f"""
+    Given the following EV models and market conditions, predict the take rate for each model.
 
-customer_group_descriptions = {
-    "Family First": "Families looking for spacious, safe, and cost-efficient EVs.",
-    "Urban Single": "Young professionals in cities who value technology and design.",
-    "Grey Hair": "Older buyers seeking comfort, safety, and reliability."
-}
+    **Model 1:** {model1}
+    **Model 2:** {model2}
+    **Customer Group:** {customer_group}
+    **Market:** {market}
+
+    Return the take rates as percentages summing to 100%.
+    """
+
+    payload = {
+        "model": "mixtral-8x7b",  # Adjust this based on Groq's available models
+        "messages": [{"role": "system", "content": "You are an expert in EV market analysis."},
+                     {"role": "user", "content": prompt}],
+        "temperature": 0.7
+    }
+
+    response = requests.post(API_URL, headers=headers, json=payload)
+
+    if response.status_code == 200:
+        result = response.json()
+        take_rates = result["choices"][0]["message"]["content"]
+        return parse_take_rates(take_rates)  # Function to extract numbers from text response
+    else:
+        st.error(f"API Error: {response.text}")
+        return None, None
+
+def parse_take_rates(response_text):
+    """Extracts numerical take rates from API response text."""
+    import re
+    matches = re.findall(r"(\d+)", response_text)
+    if len(matches) >= 2:
+        return int(matches[0]), int(matches[1])
+    return None, None
 
 st.title("EV Model Take Rate Simulator")
 
-# Sidebar for Customer Group and Market Selection
+# Sidebar inputs
 st.sidebar.header("Select Customer Group")
-customer_group = st.sidebar.selectbox("Customer Group", list(customer_group_descriptions.keys()))
-st.sidebar.write(f"**Description:** {customer_group_descriptions[customer_group]}")
-
+customer_group = st.sidebar.selectbox("Customer Group", ["Family First", "Urban Single", "Grey Hair"])
 st.sidebar.header("Select Market")
 market = st.sidebar.selectbox("Market", ["Germany", "China", "US"])
 
-# Columns for inputting two models
+# Columns for models
 col1, col2 = st.columns(2)
 
 with col1:
@@ -60,10 +79,10 @@ with col2:
 if st.button("Simulate Take Rates"):
     model1 = {"brand": brand1, "bodytype": bodytype1, "electric_range": e_range1, "price": price1, "adas": adas1}
     model2 = {"brand": brand2, "bodytype": bodytype2, "electric_range": e_range2, "price": price2, "adas": adas2}
-    take_rate1, take_rate2 = simulate_take_rate(model1, model2, customer_group, market)
     
-    st.success(f"Take Rate for Model 1: {take_rate1}%")
-    st.success(f"Take Rate for Model 2: {take_rate2}%")
+    take_rate1, take_rate2 = get_take_rate(model1, model2, customer_group, market)
     
-    st.subheader("Simulation Results")
-    st.bar_chart({"Model 1": take_rate1, "Model 2": take_rate2})
+    if take_rate1 is not None and take_rate2 is not None:
+        st.success(f"Take Rate for Model 1: {take_rate1}%")
+        st.success(f"Take Rate for Model 2: {take_rate2}%")
+        st.bar_chart({"Model 1": take_rate1, "Model 2": take_rate2})
