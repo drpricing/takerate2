@@ -33,7 +33,7 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         
         # Use the correct method to make a query to Groq
         response = client.create_chat_completion(
-            model="mixtral-8x7b", # Adjust model name if needed
+            model="llama3-70b-8192", # Adjust model name if needed
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7
         )
