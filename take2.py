@@ -32,7 +32,7 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         """
         
         # Use the correct method to make a query to Groq
-        response = client.chat.completions.create(
+        response = client.create_chat_completion(
             model="llama3-70b-8192", # Adjust model name if needed
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7
@@ -43,7 +43,16 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         
         # Parse the response from Groq and extract the take rates
         take_rates = response_dict['choices'][0]['message']['content']
-        return parse_take_rates(take_rates)
+        take_rate1, take_rate2 = parse_take_rates(take_rates)
+        
+        # Validate and normalize take rates
+        if take_rate1 is not None and take_rate2 is not None:
+            total = take_rate1 + take_rate2
+            if total != 100:
+                take_rate1 = (take_rate1 / total) * 100
+                take_rate2 = (take_rate2 / total) * 100
+        
+        return take_rate1, take_rate2
     
     except Exception as e:
         st.error(f"Error with Groq API: {str(e)}")
@@ -102,8 +111,8 @@ if st.button("Simulate Take Rates"):
         
         # Display results
         if take_rate1 is not None and take_rate2 is not None:
-            st.success(f"Take Rate for Model 1: {take_rate1}%")
-            st.success(f"Take Rate for Model 2: {take_rate2}%")
+            st.success(f"Take Rate for Model 1: {take_rate1:.2f}%")
+            st.success(f"Take Rate for Model 2: {take_rate2:.2f}%")
             st.bar_chart({"Model 1": take_rate1, "Model 2": take_rate2})
         else:
             st.warning("Please enter your API key to simulate take rates.")
