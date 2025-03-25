@@ -21,7 +21,7 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         Return the take rates as percentages summing to 100%.
         """
 
-        # Call the Groq API to simulate take rates
+        # Call the Groq API to simulate take rates using the correct method
         response = client.chat(
             model="mixtral-8x7b",  # Adjust model name if needed
             messages=[{"role": "system", "content": "You are an expert in EV market analysis."},
