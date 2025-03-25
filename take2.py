@@ -65,13 +65,13 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
 def parse_take_rates(response_text):
     """Extracts numerical take rates from API response text."""
     import re
-    matches = re.findall(r"(\d+)", response_text)
+    matches = re.findall(r"(\d+)%", response_text)
     if len(matches) >= 2:
         return int(matches[0]), int(matches[1])
     return None, None
 
 # Streamlit App UI
-st.title("EV Model Take Rate Simulator")
+st.title("EV Model Take Rate Simulator Groq")
 
 # Sidebar for entering Groq API Key
 st.sidebar.header("Enter Your Groq API Key")
