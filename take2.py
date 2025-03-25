@@ -2,6 +2,12 @@ import streamlit as st
 import os
 import groq
 
+# Function to format reasoning text
+def format_reasoning(reasoning_text):
+    """Formats the reasoning text for better readability."""
+    formatted_text = reasoning_text.replace("**", "###").replace("*", "-")
+    return formatted_text
+
 # Function to handle Groq client initialization and take rate simulation
 def get_take_rate(model1, model2, customer_group, market, api_key):
     """Fetch take rate simulation from Groq API."""
@@ -72,7 +78,7 @@ def parse_take_rates(response_text):
     return None, None
 
 # Streamlit App UI
-st.title("EV Model Take Rate Simulator Big G")
+st.title("EV Model Take Rate Simulator")
 
 # Sidebar for entering Groq API Key
 st.sidebar.header("Enter Your Groq API Key")
@@ -125,9 +131,3 @@ if st.button("Simulate Take Rates"):
             st.markdown(formatted_reasoning)
         else:
             st.warning("Please enter your API key to simulate take rates.")
-
-# Function to format reasoning text
-def format_reasoning(reasoning_text):
-    """Formats the reasoning text for better readability."""
-    formatted_text = reasoning_text.replace("**", "###").replace("*", "-")
-    return formatted_text
