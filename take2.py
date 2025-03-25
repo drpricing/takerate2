@@ -25,7 +25,7 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         Body Type: {model2['bodytype']}
         Electric Range: {model2['electric_range']} km
         Price: {model2['price']} k USD
-        ADAS Level: {model2['adas']}
+        ADAS Level: {model1['adas']}
         
         **Customer Group:** {customer_group}
         **Market:** {market}
@@ -33,10 +33,10 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         Return the take rates as percentages summing to 100%.
         """
 
-        # Call the correct API method to simulate take rates
-        response = client.create(
-            model="mixtral-8x7b",  # Adjust model name if needed
+        # Use the correct method to make a query to Groq
+        response = client.query(
             prompt=prompt,
+            model="mixtral-8x7b",  # Adjust model name if needed
             temperature=0.7
         )
 
