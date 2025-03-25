@@ -32,7 +32,7 @@ def get_take_rate(model1, model2, customer_group, market, api_key):
         """
         
         # Use the correct method to make a query to Groq
-        response = client.create_chat_completion(
+        response = client.chat.completion.create(
             model="llama3-70b-8192", # Adjust model name if needed
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7
@@ -68,7 +68,7 @@ def parse_take_rates(response_text):
     return None, None
 
 # Streamlit App UI
-st.title("EV Model Take Rate Simulator")
+st.title("EV Model Take Rate Simulator Groq")
 
 # Sidebar for entering Groq API Key
 st.sidebar.header("Enter Your Groq API Key")
