@@ -6,6 +6,7 @@ import groq
 API_KEY = st.secrets["GROQ_API_KEY"] if "GROQ_API_KEY" in st.secrets else os.getenv("GROQ_API_KEY")
 
 # Initialize Groq Client
+os.environ["GROQ_API_KEY"] = api_key
 client = groq.Client(api_key=API_KEY)
 
 def get_take_rate(model1, model2, customer_group, market):
