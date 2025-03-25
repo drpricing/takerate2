@@ -121,7 +121,7 @@ if st.button("Simulate Take Rates"):
             st.bar_chart({"Model 1": take_rate1, "Model 2": take_rate2})
             
             # Format and display reasoning
-            st.markdown("Reasoning")
+            st.markdown("### Reasoning")
             formatted_reasoning = format_reasoning(reasoning)
             st.markdown(formatted_reasoning)
         else:
